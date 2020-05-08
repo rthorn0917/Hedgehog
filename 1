@@ -1,0 +1,181 @@
+import os, random 
+
+W = 11            # number of cells for W & H
+H = 20
+D = 40          # in pixels 
+
+score = 0
+
+
+class Player:
+    def __init__(self, x):               
+        self.x = x
+        self.y = H-2
+        
+    def draw(self):
+        fill(0, 0, 128)
+        ellipse(self.x*D + D/2, (H-2)*D + D/2, D, D)        # player is a circle for now
+        
+        
+class Hedgehog:
+    def __init__(self, x):               
+        self.x = x
+        self.y = H-1
+        self.alive = True
+        
+    def draw(self):
+        fill(0, 255, 0)
+        ellipse(self.x*D + D/2, (H-1)*D + D/2, D, D)        # hedgehogs are circles for now
+        
+
+
+def indexSmallestLessThan(n, arr):
+    for i, m in enumerate(arr):
+        if m > n:
+            return i    
+
+class Alien:
+    typeByScore = [10, 20, 40, 70, 110] 
+    typeList = [[1], [1,2], [1,3], [2,3], [3]]
+    
+    def __init__(self, x):                  # x, y are for rows and columns
+        self.x = x
+        self.y = 0
+        self.health = random.choice(Alien.typeList[indexSmallestLessThan(score, Alien.typeByScore)])
+        
+    def move(self):
+        self.y += 1
+    
+    def draw(self):                            # alien is a rectangle for now
+        if self.health == 1:
+            fill(0, 255, 0)
+        elif self.health == 2:
+            fill(255, 255, 0)
+        else:    
+            fill(255, 0, 0)
+        ellipse(self.x*D + D/2, self.y*D + D/2, D, D) 
+        
+        
+class Shoot: 
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        
+    def move(self):
+        self.y -= 1
+        
+    def draw(self):
+        fill(0, 255, 255)
+        ellipse(self.x*D + D/2, self.y*D + D/2, D, D) 
+
+class Game: 
+    def __init__(self): 
+        self.alienList = []
+        self.shootList = []
+        self.hedgehogList = []
+        self.player = Player(W/2)
+        
+        for i in range(W):
+            self.hedgehogList.append(Hedgehog(i))
+            
+            
+    def end(self):
+        pass           
+            
+    def check(self):
+        global score
+        # Alien, Shoot
+        for a in self.alienList:
+            bToDelete = []
+            for b in self.shootList:
+                if a.x == b.x and (b.y == a.y-1 or b.y == a.y-2):
+                    a.health -= 1
+                    if a.health == 0:
+                        self.alienList.remove(a)
+                        score += 1
+                    bToDelete.append(b)
+                    
+            for i in bToDelete:
+                self.shootList.remove(i)
+                    
+        # Alien, Player
+        for a in self.alienList:
+            if a.x == self.player.x and a.y == self.player.y:
+                self.end()
+                break
+        
+        # Alien, Hedgehog
+        for a in self.alienList:
+            for h in self.hedgehogList:
+                if a.x == h.x and a.y == h.y:
+                    self.alienList.remove(a)
+                    self.hedgehogList.remove(h)
+                    ## Animation
+                    if len(self.hedgehogList) == 0:
+                        self.end()
+                        return
+                
+    
+    def move(self):
+        for i in self.alienList:
+            i.move()
+            if i.y >= H:
+                self.alienList.remove(i) #### WARNING
+        
+        for i in self.shootList:
+            # If a bullet has an alien on top of it, it shouldn't move
+            i.move()
+            if i.y < 0:
+                self.shootList.remove(i) #### WARNING
+        
+        self.check()
+                
+        # Generate New Aliens
+        l = list(range(W))
+        random.shuffle(l)
+        for i in range(random.randint(0, min((score//50 + 1), W))):
+            self.alienList.append(Alien(l[i]))
+            
+            
+        
+    def draw(self):
+        clear()        
+        
+
+        for i in self.shootList:
+            i.draw()
+        for i in self.alienList:
+            i.draw()
+        for i in self.hedgehogList:
+            i.draw()
+        self.player.draw()
+        
+        fill(255)
+        rect(0, H*D, W*D, H*D+20)
+        # SCORE
+        
+game = Game()
+
+def setup():
+     size(W*D, H*D+20)
+     
+def draw():
+    if frameCount % 60 == 0:
+        game.move()
+        game.draw()
+    
+def keyPressed():
+    if keyCode == LEFT:
+        if game.player.x > 0:
+            game.player.x -= 1
+            game.check()
+            game.draw()
+    elif keyCode == RIGHT:
+        if game.player.x < W-1:
+            game.player.x += 1
+            game.check()
+            game.draw()
+    elif key == " ":
+        game.shootList.append(Shoot(game.player.x, game.player.y-1))
+        game.check()
+        game.draw()
