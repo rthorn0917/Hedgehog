@@ -1,4 +1,4 @@
-import os, random 
+             import os, random 
 
 W = 15            # number of cells for W & H
 H = 20
@@ -66,9 +66,11 @@ class Shoot:
         self.x = x
         self.y = y
         self.img = loadImage(path + "/images/" + img)
+        self.createTime = millis()
         
     def move(self):
         self.y -= 1
+        
         
     def draw(self):
         #fill(0, 255, 255)
@@ -84,6 +86,10 @@ class Game:
         self.hedgehog = Hedgehog(allowedHedgehogs, "hedge.png")
         self.player = Player(W/2, "player1.png")
         self.aliencolo = ""
+        self.spacepressed = False
+        self.bullets = []
+        self.lastbullet = 0             #Last bullet
+        self.possiblebullet = 0         #Attempt to create bullet
 
 
         
@@ -155,7 +161,34 @@ class Game:
                 self.aliencolo = "alien3.png"
             self.alienList.append(Alien(l[i], self.aliencolo))
             
-            
+        
+    def update(self):
+        if self.spacepressed == True:
+            self.possiblebullet = Shoot(self.player.x, self.player.y, 0)
+            if self.lastbullet == 0:
+                if self.player.x > 0:
+                    self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
+                    self.bullet.append(self.possiblebullet)
+                    self.lastbullet = self.possiblebullet.createTime                
+                else:
+                    self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
+                    self.bullet.append(self.possiblebullet)
+                    self.lastbullet = self.possiblebullet.createTime
+                self.spacepressed = False
+            else:                                                                                      #Bullet code
+                if (self.possiblebullet.createTime - self.lastbullet) >= 1000:
+                    if self.player.x > 0:
+                        self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
+                        self.bullet.append(self.possiblebullet)
+                        self.lastbullet = self.possiblebullet.createTime
+                
+                    else:
+                        self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
+                        self.bullet.append(self.possiblebullet)
+                        self.lastbullet = self.possiblebullet.createTime
+                    self.spacepressed = False
+    
+    
         
     def draw(self):
         clear()
@@ -201,3 +234,4 @@ def keyPressed():
         game.shootList.append(Shoot(game.player.x, game.player.y-1, "bullet.png"))
         game.check()
         game.draw()
+        game.spacepressed = True
