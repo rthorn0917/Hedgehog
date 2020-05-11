@@ -1,7 +1,7 @@
 import os, random 
 
-W = 9            # number of cells for W & H
-H = 15
+W = 15            # number of cells for W & H
+H = 20
 D = 40          # in pixels 
 
 path = os.getcwd()
@@ -83,6 +83,9 @@ class Game:
         self.hedgehogList = []
         self.hedgehog = Hedgehog(allowedHedgehogs, "hedge.png")
         self.player = Player(W/2, "player1.png")
+        self.aliencolo = ""
+
+
         
         for i in range(W):
             self.hedgehogList.append(Hedgehog(i, "hedge.png"))
@@ -143,15 +146,20 @@ class Game:
         # Generate New Aliens
         l = list(range(W))
         random.shuffle(l)
-
         for i in range(random.randint(0, min((score//50 + 1), W))):
-            self.alienList.append(Alien(l[i], "alien1.png"))
+            if score == 0:
+                self.aliencolo = "alien1.png"
+            elif score == 2:
+                self.aliencolo = "alien2.png"
+            elif score == 20:
+                self.aliencolo = "alien3.png"
+            self.alienList.append(Alien(l[i], self.aliencolo))
             
             
         
     def draw(self):
-        clear()        
-        
+        clear()
+    
 
         for i in self.shootList:
             i.draw()
