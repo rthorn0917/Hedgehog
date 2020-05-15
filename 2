@@ -244,10 +244,10 @@ def draw():
         textSize(40)
         textAlign(CENTER, CENTER)
         fill(0)
-        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D+2, H*D)               # to create a fill and outline effect on the message printed on the screen
-        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D-2, H*D)
-        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D, H*D+2)
-        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D, H*D-2)
+        text("Game Over\nYour Score is" + "\nClick to play again" + str(score*10), 0, 0, W*D+2, H*D)               # to create a fill and outline effect on the message printed on the screen
+        text("Game Over\nYour Score is" + "\nClick to play again" + str(score*10), 0, 0, W*D-2, H*D)
+        text("Game Over\nYour Score is" + "\nClick to play again" + str(score*10), 0, 0, W*D, H*D+2)
+        text("Game Over\nYour Score is" + "\nClick to play again" + str(score*10), 0, 0, W*D, H*D-2)
         fill(255)
         text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D, H*D)
         game.gameover.play()
