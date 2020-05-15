@@ -48,20 +48,17 @@ class Alien:
     
     def __init__(self, x, img):                  # x, y are for rows and columns
         self.x = x
+        self.vx = 0
         self.y = 0
         self.health = random.choice(Alien.typeList[indexSmallestLessThan(score, Alien.typeByScore)])
         self.img = loadImage(path + "/images/" + img)
         
     def move(self):
         self.y += 1
-    
+        self.x = self.x + self.vx
+                
+        
     def draw(self):                                        # alien is a rectangle for now
-        #if self.health == 1:                               # the possibility of different colored alien spawning
-           # self.img = "alien1.png"
-        #elif self.health == 2:
-           # self.img = "alien2.png"
-        #else:    
-            #self.img = "alien3.png"
         image(self.img, self.x*D, self.y*D, D, D)
         
 class Shoot: 
@@ -72,6 +69,10 @@ class Shoot:
         self.createTime = millis()
         
     def move(self):
+        if score == 0:
+            self.vx = 0
+        else:
+            self.vx = 1
         self.y -= 1
         
         
@@ -97,7 +98,6 @@ class Game:
         self.shoot = player.loadFile(path + "/sounds/shoot.mp3")
         self.hedgehog = player.loadFile(path + "/sounds/hedgehog.mp3")
         self.gameover = player.loadFile(path + "/sounds/gameover.mp3")
-
         self.alive = True
 
 
@@ -123,12 +123,19 @@ class Game:
                         score += 1
                         self.alienkill.rewind()
                         self.alienkill.play()
-
                     bToDelete.append(b)
+
                     
                     
             for i in bToDelete:
                 self.shootList.remove(i)
+                
+        for a in self.alienList:
+            if score > 0:
+                if a.x == 0:
+                    a.vx = 1
+                elif a.x == W-1:
+                    a.vx = -1
                     
         # Alien, Player
         for a in self.alienList:
@@ -276,8 +283,9 @@ def keyPressed():
         game.shoot.rewind()
         game.shoot.play()
     elif key == "a":
-        game.alive = False
-        
+        print(game.player.x)
+
+                
 def mouseClicked():
     global game
     if game.alive == False:
