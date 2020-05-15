@@ -89,7 +89,6 @@ class Game:
         self.hedgehogList = []
         self.hedgehog = Hedgehog(allowedHedgehogs, "hedge.png")
         self.player = Player(W/2, "player1.png")
-        self.aliencolo = ""
         self.spacepressed = False
         self.bullets = []
         self.alienkill = player.loadFile(path + "/sounds/kill.mp3")
@@ -101,6 +100,7 @@ class Game:
         self.alive = True
         self.bulletavailable = 5
         self.backgroundimage = loadImage(path + "/images/background.png")
+        level = "1"
 
 
 
@@ -185,13 +185,7 @@ class Game:
         l = list(range(W))
         random.shuffle(l)
         for i in range(random.randint(0, min((score//50 + 1), W))):
-            if score == 0:
-                self.aliencolo = "alien1.png"
-            elif score == 10:
-                self.aliencolo = "alien2.png"
-            elif score == 20:
-                self.aliencolo = "alien3.png"
-            self.alienList.append(Alien(l[i], self.aliencolo))
+            self.alienList.append(Alien(l[i], "alien1.png"))
             
     
     
@@ -208,13 +202,19 @@ class Game:
         for i in self.hedgehogList:
             i.draw()
         self.player.draw()
-        
+        if score < 10:
+            level = "1"
+        elif score >= 10 and score < 20:
+            level = "2"
+        else:
+            level = "3"
         fill(255)
         rect(0, H*D, W*D, H*D+20)
         # display SCORE
         fill(0)
         textSize(18)
         text("Score: " + str(score * 10), W, H*D + 20)
+        text("Level: " + level, W+150, H*D +20)
         text("Available Bullets: " + str(game.bulletavailable), W+310, H*D + 20)
         
         
