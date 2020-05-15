@@ -116,7 +116,7 @@ class Game:
         for a in self.alienList:
             bToDelete = []
             for b in self.shootList:
-                if a.x == b.x and (b.y == a.y-1 or b.y == a.y-2):
+                if a.x == b.x and (b.y == a.y or b.y == a.y-1):
                     a.health -= 1
                     if a.health == 0:
                         self.alienList.remove(a)
