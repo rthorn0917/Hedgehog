@@ -1,8 +1,8 @@
-             import os, random 
+import os, random 
 
-W = 15            # number of cells for W & H
-H = 20
-D = 40          # in pixels 
+W = 10            # number of cells for W & H
+H = 15
+D = 50          # in pixels 
 
 path = os.getcwd()
 
@@ -155,38 +155,38 @@ class Game:
         for i in range(random.randint(0, min((score//50 + 1), W))):
             if score == 0:
                 self.aliencolo = "alien1.png"
-            elif score == 2:
+            elif score == 10:
                 self.aliencolo = "alien2.png"
             elif score == 20:
                 self.aliencolo = "alien3.png"
             self.alienList.append(Alien(l[i], self.aliencolo))
             
         
-    def update(self):
-        if self.spacepressed == True:
-            self.possiblebullet = Shoot(self.player.x, self.player.y, 0)
-            if self.lastbullet == 0:
-                if self.player.x > 0:
-                    self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
-                    self.bullet.append(self.possiblebullet)
-                    self.lastbullet = self.possiblebullet.createTime                
-                else:
-                    self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
-                    self.bullet.append(self.possiblebullet)
-                    self.lastbullet = self.possiblebullet.createTime
-                self.spacepressed = False
-            else:                                                                                      #Bullet code
-                if (self.possiblebullet.createTime - self.lastbullet) >= 1000:
-                    if self.player.x > 0:
-                        self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
-                        self.bullet.append(self.possiblebullet)
-                        self.lastbullet = self.possiblebullet.createTime
+    # def update(self):
+    #     if self.spacepressed == True:
+    #         self.possiblebullet = Shoot(self.player.x, self.player.y, 0)
+    #         if self.lastbullet == 0:
+    #             if self.player.x > 0:
+    #                 self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
+    #                 self.bullet.append(self.possiblebullet)
+    #                 self.lastbullet = self.possiblebullet.createTime                
+    #             else:
+    #                 self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
+    #                 self.bullet.append(self.possiblebullet)
+    #                 self.lastbullet = self.possiblebullet.createTime
+    #             self.spacepressed = False
+    #         else:                                                                                      #Bullet code
+    #             if (self.possiblebullet.createTime - self.lastbullet) >= 1000:
+    #                 if self.player.x > 0:
+    #                     self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
+    #                     self.bullet.append(self.possiblebullet)
+    #                     self.lastbullet = self.possiblebullet.createTime
                 
-                    else:
-                        self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
-                        self.bullet.append(self.possiblebullet)
-                        self.lastbullet = self.possiblebullet.createTime
-                    self.spacepressed = False
+    #                 else:
+    #                     self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
+    #                     self.bullet.append(self.possiblebullet)
+    #                     self.lastbullet = self.possiblebullet.createTime
+    #                 self.spacepressed = False
     
     
         
@@ -215,9 +215,21 @@ def setup():
      size(W*D, H*D+30)
      
 def draw():
-    if frameCount % 60 == 0:
-        game.move()
-        game.draw()
+    if score < 10:
+        if frameCount%45 == 0:
+            game.move()
+            game.draw()
+        
+    elif score < 20:
+        if frameCount%40 == 0:
+            game.move()
+            game.draw()
+        
+    elif score >= 20:
+        if frameCount%35 == 0:
+            game.move()
+            game.draw()
+    
     
 def keyPressed():
     if keyCode == LEFT:
