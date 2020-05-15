@@ -240,9 +240,16 @@ def draw():
                 game.move()
                 game.draw()
     else:
+         # after the game ends it will display a message that 'Game Over' and the score that the player have received
         textSize(40)
-        text("Game over", 50, 50)
-        game.gameover.play()
+        textAlign(CENTER, CENTER)
+        fill(0)
+        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D+2, H*D)               # to create a fill and outline effect on the message printed on the screen
+        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D-2, H*D)
+        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D, H*D+2)
+        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D, H*D-2)
+        fill(255)
+        text("Game Over\nYour Score is " + str(score*10), 0, 0, W*D, H*D)
     
     
 def keyPressed():
