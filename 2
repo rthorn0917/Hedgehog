@@ -55,7 +55,7 @@ class Alien:
         
     def move(self):
         self.y += 1
-        if score == 0:
+        if score == 10:
             self.x = self.x
         else:
             self.x = self.x+self.vx
@@ -92,14 +92,14 @@ class Game:
         self.aliencolo = ""
         self.spacepressed = False
         self.bullets = []
-        self.lastbullet = 0             #Last bullet
-        self.possiblebullet = 0         #Attempt to create bullet
         self.alienkill = player.loadFile(path + "/sounds/kill.mp3")
         self.shoot = player.loadFile(path + "/sounds/shoot.mp3")
         self.hedgehog = player.loadFile(path + "/sounds/hedgehog.mp3")
         self.gameover = player.loadFile(path + "/sounds/gameover.mp3")
-        self.bgsound = player.loadFile(path + "/sounds/bgsound.mp3")
+        self.bgmusic = player.loadFile(path + "/sounds/bgmusic.mp3")
+        self.bgmusic.loop()
         self.alive = True
+        self.bulletavailable = 5
 
 
 
@@ -122,6 +122,7 @@ class Game:
                     if a.health == 0:
                         self.alienList.remove(a)
                         score += 1
+                        self.bulletavailable += 2
                         self.alienkill.rewind()
                         self.alienkill.play()
                     bToDelete.append(b)
@@ -191,32 +192,6 @@ class Game:
                 self.aliencolo = "alien3.png"
             self.alienList.append(Alien(l[i], self.aliencolo))
             
-        
-    # def update(self):
-    #     if self.spacepressed == True:
-    #         self.possiblebullet = Shoot(self.player.x, self.player.y, 0)
-    #         if self.lastbullet == 0:
-    #             if self.player.x > 0:
-    #                 self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
-    #                 self.bullet.append(self.possiblebullet)
-    #                 self.lastbullet = self.possiblebullet.createTime                
-    #             else:
-    #                 self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
-    #                 self.bullet.append(self.possiblebullet)
-    #                 self.lastbullet = self.possiblebullet.createTime
-    #             self.spacepressed = False
-    #         else:                                                                                      #Bullet code
-    #             if (self.possiblebullet.createTime - self.lastbullet) >= 1000:
-    #                 if self.player.x > 0:
-    #                     self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
-    #                     self.bullet.append(self.possiblebullet)
-    #                     self.lastbullet = self.possiblebullet.createTime
-                
-    #                 else:
-    #                     self.possiblebullet = Shoot(self.player.x, self.player.y - 20, "bullet.png")
-    #                     self.bullet.append(self.possiblebullet)
-    #                     self.lastbullet = self.possiblebullet.createTime
-    #                 self.spacepressed = False
     
     
         
@@ -237,6 +212,7 @@ class Game:
         fill(0)
         textSize(18)
         text("Score: " + str(score * 10), W, H*D + 20)
+        text("Available Bullets: " + str(game.bulletavailable), W+310, H*D + 20)
         
         
 game = Game()
@@ -247,12 +223,12 @@ def setup():
 def draw():
     if game.alive == True:
         if score < 10:
-            if frameCount%45 == 0:
+            if frameCount%60 == 0:
                 game.move()
                 game.draw()
             
         elif score < 20:
-            if frameCount%42 == 0:
+            if frameCount%50 == 0:
                 game.move()
                 game.draw()
             
@@ -278,14 +254,16 @@ def keyPressed():
             game.check()
             game.draw()
     elif key == " ":
-        game.shootList.append(Shoot(game.player.x, game.player.y-1, "bullet.png"))
-        game.check()
-        game.draw()
-        game.spacepressed = True
-        game.shoot.rewind()
-        game.shoot.play()
-    elif key == "a":
-        print(game.player.x)
+        if game.bulletavailable > 0:
+            game.shootList.append(Shoot(game.player.x, game.player.y-1, "bullet.png"))
+            game.check()
+            game.draw()
+            game.spacepressed = True
+            game.shoot.rewind()
+            game.shoot.play()
+            game.bulletavailable += -1
+        else:
+            None
 
                 
 def mouseClicked():
