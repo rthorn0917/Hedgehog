@@ -148,9 +148,12 @@ class Game:
                     if len(self.hedgehogList) == 0:
                         self.end()
                         self.alive = False
-                        self.gameover.rewind()
-                        self.gameover.play()
                         return
+    
+        for a in self.alienList:
+            if a.x == self.player.x and a.y == self.player.y:
+                self.alive = False
+                return
                 
     
     def move(self):
@@ -210,12 +213,6 @@ class Game:
         
     def draw(self):
         clear()
-    
-        if self.alive == False:
-            textSize(40)
-            text("Game over", 50, 50)
-            self.gameover.play()
-            return
 
         for i in self.shootList:
             i.draw()
@@ -239,20 +236,25 @@ def setup():
      size(W*D, H*D+30)
      
 def draw():
-    if score < 10:
-        if frameCount%45 == 0:
-            game.move()
-            game.draw()
-        
-    elif score < 20:
-        if frameCount%42 == 0:
-            game.move()
-            game.draw()
-        
-    elif score >= 20:
-        if frameCount%40 == 0:
-            game.move()
-            game.draw()
+    if game.alive == True:
+        if score < 10:
+            if frameCount%45 == 0:
+                game.move()
+                game.draw()
+            
+        elif score < 20:
+            if frameCount%42 == 0:
+                game.move()
+                game.draw()
+            
+        elif score >= 20:
+            if frameCount%40 == 0:
+                game.move()
+                game.draw()
+    else:
+        textSize(40)
+        text("Game over", 50, 50)
+        game.gameover.play()
     
     
 def keyPressed():
