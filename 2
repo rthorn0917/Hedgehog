@@ -232,6 +232,7 @@ def draw():
         text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D, H*D-2)
         fill(255)
         text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D, H*D)
+        game.bgmusic.pause()
         game.gameover.play()
     
     
