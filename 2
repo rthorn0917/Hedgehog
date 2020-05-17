@@ -1,7 +1,7 @@
 add_library('minim')
 import os, random 
 
-W = 10            # number of cells for W & H
+W = 11            # number of cells for W & H
 H = 15
 D = 50          # in pixels 
 
@@ -12,7 +12,7 @@ player = Minim(this)
 score = 0
 
 
-class Player:
+class Player:                       #class Player contains x,y position and the draw function
     def __init__(self, x, img):               
         self.x = x
         self.y = H-2
@@ -20,11 +20,10 @@ class Player:
         
         
     def draw(self):
-        #fill(0, 0, 128)
-        image(self.img, self.x*D, self.y*D, D, D)        # player is a circle for now
+        image(self.img, self.x*D, self.y*D, D, D)        
         
         
-class Hedgehog:
+class Hedgehog:                    #class Hedgehog contains x,y position and the draw function
     def __init__(self, x, img):               
         self.x = x
         self.y = H-1
@@ -32,52 +31,40 @@ class Hedgehog:
         self.img = loadImage(path + "/images/" + img)
         
     def draw(self):
-        #fill(0, 255, 0)
-        image(self.img, self.x*D, (H-1)*D, D, D)        # hedgehogs are circles for now
-        
+        image(self.img, self.x*D, (H-1)*D, D, D)
+          
 
+class Alien:                           #class Player contains x,y position and the draw function
 
-def indexSmallestLessThan(n, arr):
-    for i, m in enumerate(arr):
-        if m > n:
-            return i    
-
-class Alien:
-    typeByScore = [10, 20, 40, 70, 110] 
-    typeList = [[1], [1,2], [1,3], [2,3], [3]]
-    
     def __init__(self, x, img):                  # x, y are for rows and columns
         self.x = x
         self.vx = 1
         self.y = 0
-        self.health = random.choice(Alien.typeList[indexSmallestLessThan(score, Alien.typeByScore)])
         self.img = loadImage(path + "/images/" + img)
         
-    def move(self):
+    def move(self):                    # alien movement
         self.y += 1
-        if score < 10:
+        if score < 10:               # move straight down before raw score is 10 (printed score 100)
             self.x = self.x
         else:
-            self.x = self.x+self.vx
-
-                
+            self.x = self.x+self.vx    # start moving diagonally once 10 aliens are killed 
         
-    def draw(self):                                        # alien is a rectangle for now
+        
+    def draw(self):                                        
         image(self.img, self.x*D, self.y*D, D, D)
         
-class Shoot: 
+class Shoot:                         # class shoot is for the bullet 
     def __init__(self, x, y, img):
         self.x = x
         self.y = y
         self.img = loadImage(path + "/images/" + img)
         self.createTime = millis()
         
-    def move(self):
+    def move(self):                # bullet moves upward by one cell at a time until it hits an alien or moves outside the board
         self.y -= 1
         
         
     def draw(self):
-        #fill(0, 255, 255)
         image(self.img, self.x*D, self.y*D, D, D) 
 
 allowedHedgehogs = range(1, W) # a row of hedgehogs in the beginning to the game 
@@ -95,73 +82,65 @@ class Game:
         self.shoot = player.loadFile(path + "/sounds/shoot.mp3")
         self.hedgehog = player.loadFile(path + "/sounds/hedgehog.mp3")
         self.gameover = player.loadFile(path + "/sounds/gameover.mp3")
-        self.bgmusic = player.loadFile(path + "/sounds/bgmusic.mp3")
+        self.bgmusic = player.loadFile(path + "/sounds/bgmusic.mp3")       #backgroundmusic
         self.bgmusic.loop()
         self.alive = True
-        self.bulletavailable = 5
+        self.bulletavailable = 5            # 5 initial bullets, and will keep adding on as time pass
+                                            # to limit the number of bullets the player has 
         self.backgroundimage = loadImage(path + "/images/background.png")
         level = "1"
-
-
-
         
         for i in range(W):
-            self.hedgehogList.append(Hedgehog(i, "hedge.png"))
-            
+            self.hedgehogList.append(Hedgehog(i, "hedge.png"))     # a row of hedgehogs in the beginning to the game
             
             
     def check(self):
         global score
-        # Alien, Shoot
+        # Alien, Shoot touch each other, they both should disappear 
         for a in self.alienList:
             bToDelete = []
             for b in self.shootList:
                 if a.x == b.x and (b.y == a.y or b.y == a.y-1):
-                    a.health -= 1
-                    if a.health == 0:
-                        self.alienList.remove(a)
-                        score += 1
-                        self.bulletavailable += 2
-                        self.alienkill.rewind()
-                        self.alienkill.play()
+                    self.alienList.remove(a)                       # removed alien
+                    score += 1                                     # add score
+                    self.bulletavailable += 2                      # add more bullets for player
+                    self.alienkill.rewind()
+                    self.alienkill.play()
                     bToDelete.append(b)
 
                     
                     
             for i in bToDelete:
-                self.shootList.remove(i)
+                self.shootList.remove(i)                           # removed bullet
                 
 
-        if score > 0:
+        if score > 0:                      # when raw score is greater than 10, the aliens start moving diagonally
             for a in self.alienList:
-                if a.x == 0:
+                if a.x == 0:                # boucning off the walls
                     a.vx = 1
                 elif a.x == W-1:
                     a.vx = -1
                     
-        # Alien, Player
+        # Alien, Player touch, the game should end
         for a in self.alienList:
             if a.x == self.player.x and a.y == self.player.y:
                 self.alive = False
+                return
         
-        # Alien, Hedgehog
+        # Alien, Hedgehog touch, both should be removed
         for a in self.alienList:
             for h in self.hedgehogList:
                 if a.x == h.x and a.y == h.y:                    
-                    
-                    
                     self.alienList.remove(a)
                     self.hedgehogList.remove(h)
                     self.hedgehog.rewind()
                     self.hedgehog.play()
-                    ## Animation
-                    if len(self.hedgehogList) == 0:
-                        self.end()
-                        self.alive = False
-                        return
-    
-        for a in self.alienList:
-            if a.x == self.player.x and a.y == self.player.y:
+                    break
+            else:
+                if a.y == H-1:                        # if the alien passes an empty cell where the hedgehog used to be, a random hedgehog is removed
+                    self.hedgehogList.remove(random.choice(self.hedgehogList))       # to incentivise the player to keep protecting the column
+                
+            if len(self.hedgehogList) == 0:           # the game ends if there are no more hedgehogs 
                 self.alive = False
                 return
             
@@ -170,14 +149,14 @@ class Game:
     def move(self):
         for i in self.alienList:
             i.move()
-            if i.y >= H:
-                self.alienList.remove(i) #### WARNING
+            if i.y >= H:                     # removes the alien if it passes the board
+                self.alienList.remove(i) 
         
         for i in self.shootList:
             # If a bullet has an alien on top of it, it shouldn't move
             i.move()
-            if i.y < 0:
-                self.shootList.remove(i) #### WARNING
+            if i.y < 0:                      # remove the bullet if it passes the board
+                self.shootList.remove(i) 
         
         self.check()
                 
@@ -192,30 +171,33 @@ class Game:
         
     def draw(self):
         clear()
-        image(self.backgroundimage, 0, 0, W*D, H*D)
+        image(self.backgroundimage, 0, 0, W*D, H*D)      # background image
 
 
-        for i in self.shootList:
+        for i in self.shootList:               # draws bullets
             i.draw()
-        for i in self.alienList:
+        for i in self.alienList:               # draws aliens
             i.draw()
-        for i in self.hedgehogList:
+        for i in self.hedgehogList:            # draws hedghogs
             i.draw()
-        self.player.draw()
-        if score < 10:
+        self.player.draw()                     # draws player
+        if score < 10:                         # printed level changes when the raw score change
             level = "1"
         elif score >= 10 and score < 20:
             level = "2"
         else:
             level = "3"
+        
+        textAlign(LEFT)
+        
         fill(255)
         rect(0, H*D, W*D, H*D+20)
         # display SCORE
         fill(0)
         textSize(18)
-        text("Score: " + str(score * 10), W, H*D + 20)
+        text("Score: " + str(score * 10), W, H*D + 20)                 # displayed score is *10 the raw score
         text("Level: " + level, W+150, H*D +20)
-        text("Available Bullets: " + str(game.bulletavailable), W+310, H*D + 20)
+        text("Available Bullets: " + str(game.bulletavailable), W+310, H*D + 20)       # tells the player how many bullets they have
         
         
 game = Game()
@@ -224,49 +206,47 @@ def setup():
      size(W*D, H*D+30)
      
 def draw():
-    if frameCount%60 == 0:
-        
-        if game.alive == True:
-            if score < 10:
-                if frameCount%60 == 0:
-                    game.move()
-                    game.draw()
-                
-            elif score < 20:
-                if frameCount%50 == 0:
-                    game.move()
-                    game.draw()
-                
-            elif score >= 20:
-                if frameCount%40 == 0:
-                    game.move()
-                    game.draw()
-        else:
-            # after the game ends it will display a message that 'Game Over' and the score that the player have received
-            textSize(40)
-            textAlign(CENTER, CENTER)
-            fill(0)
-            text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D+2, H*D)               # to create a fill and outline effect on the message printed on the screen
-            text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D-2, H*D)
-            text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D, H*D+2)
-            text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D, H*D-2)
-            fill(255)
-            text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D, H*D)
-            game.gameover.play()
+    if game.alive == True:
+        if score < 10:
+            if frameCount%60 == 0:
+                game.move()
+                game.draw()
+            
+        elif score < 20:              # speed of the aliens increase
+            if frameCount%50 == 0:
+                game.move()
+                game.draw()
+            
+        elif score >= 20:             # speed of the aliens increase
+            if frameCount%40 == 0:
+                game.move()
+                game.draw()
+    else:
+        # after the game ends it will display a message that 'Game Over' and the score that the player have received
+        textSize(40)
+        textAlign(CENTER, CENTER)
+        fill(0)
+        text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D+2, H*D)               # to create a fill and outline effect on the message printed on the screen
+        text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D-2, H*D)
+        text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D, H*D+2)
+        text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D, H*D-2)
+        fill(255)
+        text("Game Over\nYour Score is " + str(score*10) + "\nClick to play again", 0, 0, W*D, H*D)
+        game.gameover.play()
     
     
 def keyPressed():
-    if keyCode == LEFT:
+    if keyCode == LEFT:            # player is moved left when left key is pressed
         if game.player.x > 0:
             game.player.x -= 1
             game.check()
             game.draw()
-    elif keyCode == RIGHT:
+    elif keyCode == RIGHT:            # player is moved right when right key is pressed
         if game.player.x < W-1:
             game.player.x += 1
             game.check()
             game.draw()
-    elif key == " ":
+    elif key == " ":                  # player can shoot bullets when there are available bullets and when the space bar is pressed
         if game.bulletavailable > 0:
             game.shootList.append(Shoot(game.player.x, game.player.y-1, "bullet.png"))
             game.check()
@@ -282,7 +262,8 @@ def keyPressed():
 
 
                 
-def mouseClicked():
-    global game
+def mouseClicked():             # when the mouse is clicked anywhere on the board, the game should restart
+    global game, score
     if game.alive == False:
+        score = 0
         game = Game()
