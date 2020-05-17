@@ -116,7 +116,7 @@ class Game:
 
         if score > 0:                      # when raw score is greater than 10, the aliens start moving diagonally
             for a in self.alienList:
-                if a.x == 0:                # boucning off the walls
+                if a.x == 0:                # bouncing off the walls
                     a.vx = 1
                 elif a.x == W-1:
                     a.vx = -1
